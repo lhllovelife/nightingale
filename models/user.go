@@ -86,6 +86,7 @@ func (u *User) String() string {
 	return fmt.Sprintf("<id:%d username:%s nickname:%s email:%s phone:%s contacts:%s>", u.Id, u.Username, u.Nickname, u.Email, u.Phone, string(bs))
 }
 
+// 方法：判定某个用户是否为“Admin角色”
 func (u *User) IsAdmin() bool {
 	for i := 0; i < len(u.RolesLst); i++ {
 		if u.RolesLst[i] == AdminRole {
@@ -283,6 +284,7 @@ func UserGetById(ctx *ctx.Context, id int64) (*User, error) {
 	return UserGet(ctx, "id=?", id)
 }
 
+// 查询root账户是否存在
 func InitRoot(ctx *ctx.Context) {
 	user, err := UserGetByUsername(ctx, "root")
 	if err != nil {

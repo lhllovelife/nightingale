@@ -7,13 +7,13 @@ Dir = "logs"
 # log level: DEBUG INFO WARNING ERROR
 Level = "DEBUG"
 # stdout, stderr, file
-Output = "stdout"
+Output = "file"
 # # rotate by time
 # KeepHours = 4
 # # rotate by size
-# RotateNum = 3
+RotateNum = 3
 # # unit: MB
-# RotateSize = 256
+RotateSize = 256
 
 [HTTP]
 # http listening address
@@ -25,13 +25,13 @@ CertFile = ""
 # https key file path
 KeyFile = ""
 # whether print access log
-PrintAccessLog = false
+PrintAccessLog = true
 # whether enable pprof
 PProf = true
 # expose prometheus /metrics?
 ExposeMetrics = true
 # http graceful shutdown timeout, unit: s
-ShutdownTimeout = 30
+ShutdownTimeout = 10
 # max content length: 64M
 MaxContentLength = 67108864
 # http server read timeout, unit: s
@@ -117,6 +117,7 @@ EngineName = "default"
 
 [Center]
 MetricsYamlFile = "./etc/metrics.yaml"
+BuiltinIntegrationsDir = "./integrations"
 I18NHeaderKey = "X-Language"
 
 [Center.AnonymousAccess]
@@ -140,7 +141,7 @@ ForceUseServerTS = true
 
 [[Pushgw.Writers]] 
 # Url = "http://127.0.0.1:8480/insert/0/prometheus/api/v1/write"
-Url = "http://127.0.0.1:9090/api/v1/write"
+Url = "http://127.0.0.1:8428/api/v1/write"
 # Basic auth username
 BasicAuthUser = ""
 # Basic auth password

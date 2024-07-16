@@ -22,7 +22,7 @@ func Init(ctx *ctx.Context, builtinIntegrationsDir string) {
 	// var fileList []string
 	dirList, err := file.DirsUnder(fp)
 	ginx.Dangerous(err)
-
+	// First 遍历integration下的每个目录，读取配置文件，创建对应的models.BuiltinComponent实例，将元数据写入db(if not exists in db)
 	for _, dir := range dirList {
 		// components icon
 		componentDir := fp + "/" + dir
@@ -55,7 +55,7 @@ func Init(ctx *ctx.Context, builtinIntegrationsDir string) {
 		} else if err != nil {
 			logger.Warningf("read builtin component markdown dir fail %s %v", component.Ident, err)
 		}
-
+		// 判断该组件的元数据是否已经存在于DB中，
 		exists, _ := models.BuiltinComponentExists(ctx, &component)
 		if !exists {
 			err = component.Add(ctx, "system")
@@ -65,7 +65,7 @@ func Init(ctx *ctx.Context, builtinIntegrationsDir string) {
 			}
 		}
 
-		// alerts
+		// Second alerts 告警规则
 		files, err = file.FilesUnder(componentDir + "/alerts")
 		if err == nil && len(files) > 0 {
 			for _, f := range files {
@@ -119,7 +119,7 @@ func Init(ctx *ctx.Context, builtinIntegrationsDir string) {
 			}
 		}
 
-		// dashboards
+		// dashboards 仪表盘
 		files, err = file.FilesUnder(componentDir + "/dashboards")
 		if err == nil && len(files) > 0 {
 			for _, f := range files {
@@ -172,7 +172,7 @@ func Init(ctx *ctx.Context, builtinIntegrationsDir string) {
 			logger.Warningf("read builtin component dash dir fail %s %v", component.Ident, err)
 		}
 
-		// metrics
+		// metrics 指标
 		files, err = file.FilesUnder(componentDir + "/metrics")
 		if err == nil && len(files) > 0 {
 			for _, f := range files {

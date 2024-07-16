@@ -23,22 +23,25 @@ var (
 )
 
 func main() {
-	flag.Parse()
+	flag.Parse() // 解析命令行参数
 
-	if *showVersion {
+	if *showVersion { // 输出版本信息
 		fmt.Println(version.Version)
-		os.Exit(0)
+		os.Exit(0) // 终止当前程序的执行并返回给定的状态码 (0 表示正常退出)
 	}
 
 	printEnv()
 
-	tcpx.WaitHosts()
+	tcpx.WaitHosts() // 等待外部服务或主机就绪 (主机信息通过环境变量获取)
 
-	cleanFunc, err := center.Initialize(*configDir, *cryptoKey)
+	cleanFunc, err := center.Initialize(*configDir, *cryptoKey) // 初始化（如果初始化过程出现err, 终止程序）
 	if err != nil {
 		log.Fatalln("failed to initialize:", err)
 	}
 
+	/**
+	使用系统信号实现程序的优雅退出
+	*/
 	code := 1
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -58,12 +61,21 @@ EXIT:
 		}
 	}
 
+	// 执行收尾工作
 	cleanFunc()
 	fmt.Println("process exited")
 	os.Exit(code)
 }
 
 func printEnv() {
+	/* runner.Init
+	1. 自动的根据CGROUP值识别容器的 CPU quota，并自动设置 GOMAXPROCS 线程数量
+	2. 设置日志格式为日期、时间和短文件名
+	3. 设置全局变量 Hostname 和 Cwd
+	    - Hostname 主机名称(uname -n)
+	    - Cwd 当前工作目录
+	4. 设置随机数种子
+	*/
 	runner.Init()
 	fmt.Println("runner.cwd:", runner.Cwd)
 	fmt.Println("runner.hostname:", runner.Hostname)

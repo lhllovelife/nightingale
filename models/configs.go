@@ -113,6 +113,7 @@ func ConfigsGet(ctx *ctx.Context, ckey string) (string, error) { //select built-
 	}
 
 	var lst []string
+	// GORM 中的 Pluck 方法用于从数据库中查询单列并扫描结果到片段（slice）。 当您需要从模型中检索特定字段时，此方法非常理想
 	err := DB(ctx).Model(&Configs{}).Where("ckey=?  and external=? ", ckey, 0).Pluck("cval", &lst).Error
 	if err != nil {
 		return "", errors.WithMessage(err, "failed to query configs")

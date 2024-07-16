@@ -17,7 +17,7 @@ type Config struct {
 }
 
 func Init(c Config) (func(), error) {
-	logger.SetSeverity(c.Level)
+	logger.SetSeverity(c.Level) // 设置日志级别
 
 	if c.Output == "stderr" {
 		logger.LogToStderr()

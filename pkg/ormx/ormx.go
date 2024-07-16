@@ -28,10 +28,10 @@ type DBConfig struct {
 var gormLogger = logger.New(
 	&TKitLogger{tklog.GetLogger()},
 	logger.Config{
-		SlowThreshold:             2 * time.Second,
-		LogLevel:                  logger.Warn,
-		IgnoreRecordNotFoundError: false,
-		Colorful:                  true,
+		SlowThreshold:             2 * time.Second, // Slow SQL threshold
+		LogLevel:                  logger.Warn,     // Log level
+		IgnoreRecordNotFoundError: false,           // Ignore ErrRecordNotFound error for logge
+		Colorful:                  true,            // log color
 	},
 )
 var logLevelMap map[string]logger.LogLevel
@@ -104,9 +104,9 @@ func New(c DBConfig) (*gorm.DB, error) {
 		return nil, err
 	}
 
+	// 连接池
 	sqlDB.SetMaxIdleConns(c.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(c.MaxOpenConns)
 	sqlDB.SetConnMaxLifetime(time.Duration(c.MaxLifetime) * time.Second)
-
 	return db, nil
 }

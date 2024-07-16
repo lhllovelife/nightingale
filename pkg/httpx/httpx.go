@@ -146,6 +146,10 @@ func Init(cfg Config, handler http.Handler) func() {
 	}()
 
 	return func() {
+		value := context.WithValue(context.Background(), "1", "2")
+
+		value.Value("1")
+
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(cfg.ShutdownTimeout))
 		defer cancel()
 

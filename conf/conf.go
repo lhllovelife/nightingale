@@ -53,21 +53,23 @@ type Output struct {
 }
 
 func InitConfig(configDir, cryptoKey string) (*ConfigType, error) {
-	var config = new(ConfigType)
+	var config = new(ConfigType) // 分配一块ConfigType类型的内存，初始化值为对应的零值，返回新分配内存的地址
 
+	// 从指定目录加载配置文件内容写到config地址对应的内存
 	if err := cfg.LoadConfigByDir(configDir, config); err != nil {
 		return nil, fmt.Errorf("failed to load configs of directory: %s error: %s", configDir, err)
 	}
 
-	config.Pushgw.PreCheck()
-	config.Alert.PreCheck(configDir)
-	config.Center.PreCheck()
+	config.Pushgw.PreCheck()         // Pushgw配置参数前置检查
+	config.Alert.PreCheck(configDir) // Alert配置参数前置检查
+	config.Center.PreCheck()         // Center配置参数前置检查
 
 	err := decryptConfig(config, cryptoKey)
 	if err != nil {
 		return nil, err
 	}
 
+	// Alert心跳 IP配置检查
 	if config.Alert.Heartbeat.IP == "" {
 		// auto detect
 		config.Alert.Heartbeat.IP = fmt.Sprint(GetOutboundIP())
@@ -91,6 +93,7 @@ func InitConfig(configDir, cryptoKey string) (*ConfigType, error) {
 	return config, nil
 }
 
+// 从连接中获取本地地址并返回IP部分
 func GetOutboundIP() net.IP {
 	conn, err := net.Dial("udp", "223.5.5.5:80")
 	if err != nil {
