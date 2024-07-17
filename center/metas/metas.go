@@ -46,6 +46,7 @@ func (s *Set) Set(ident string, meta models.HostMeta) {
 	s.items[ident] = meta
 }
 
+// 持续将数据持久化到 Redis中, ，每秒调用一次persist()方法
 func (s *Set) LoopPersist() {
 	for {
 		time.Sleep(time.Second)
@@ -53,11 +54,12 @@ func (s *Set) LoopPersist() {
 	}
 }
 
+// 将该实例内存中存储的所有主机元数据，进行持久化
 func (s *Set) persist() {
 	var items map[string]models.HostMeta
 
 	s.Lock()
-	if len(s.items) == 0 {
+	if len(s.items) == 0 { // 无数据，返回
 		s.Unlock()
 		return
 	}
@@ -69,8 +71,10 @@ func (s *Set) persist() {
 	s.updateMeta(items)
 }
 
+// 将 HostMeta 对象按 100 个为一组批量更新到 Redis 中，不足100的，则按照一个批次持久化。
+// 如果有扩展信息（ExtendInfo），则单独处理并存储
 func (s *Set) updateMeta(items map[string]models.HostMeta) {
-	m := make(map[string]models.HostMeta, 100)
+	m := make(map[string]models.HostMeta, 100) // 定义一个初使容量为100个的map
 	num := 0
 
 	for _, meta := range items {
@@ -90,6 +94,9 @@ func (s *Set) updateMeta(items map[string]models.HostMeta) {
 	}
 }
 
+// updateTargets 方法将处理后的 HostMeta 数据使用 storage.MSet 方法批量写入 Redis。如果 ExtendInfo 存在，也会单独写入 Redis。
+// 参数key: n9e_meta_{hostname} 参数value: 去除了扩展信息的主机信息
+// 参数key: n9e_extend_meta_{hostname} 参数value: 扩展信息
 func (s *Set) updateTargets(m map[string]models.HostMeta) error {
 	if s.redis == nil {
 		logger.Warningf("redis is nil")
@@ -115,7 +122,7 @@ func (s *Set) updateTargets(m map[string]models.HostMeta) error {
 		}
 		newMap[models.WrapIdent(ident)] = meta
 	}
-	err := storage.MSet(context.Background(), s.redis, newMap)
+	err := storage.MSet(context.Background(), s.redis, newMap) // 通过 go-redis Pipeline 一次执行多个命令
 	if err != nil {
 		return err
 	}

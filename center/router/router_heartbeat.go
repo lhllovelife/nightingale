@@ -51,10 +51,10 @@ func (rt *Router) heartbeat(c *gin.Context) {
 		req.EngineName = rt.Alert.Heartbeat.EngineName
 	}
 
-	rt.MetaSet.Set(req.Hostname, req)
+	rt.MetaSet.Set(req.Hostname, req) // 将心跳信息携带的主机元数据，写到元数据map中。
 	var items = make(map[string]struct{})
 	items[req.Hostname] = struct{}{}
-	rt.IdentSet.MSet(items)
+	rt.IdentSet.MSet(items) // 主机名称
 
 	if target, has := rt.TargetCache.Get(req.Hostname); has && target != nil {
 		gid := ginx.QueryInt64(c, "gid", 0)

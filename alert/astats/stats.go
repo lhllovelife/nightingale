@@ -26,6 +26,7 @@ type Stats struct {
 }
 
 func NewSyncStats() *Stats {
+	// 1. 规则评估的次数
 	CounterRuleEval := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -33,6 +34,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of rule eval.",
 	}, []string{})
 
+	// 2. 规则评估错误的次数
 	CounterRuleEvalErrorTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -40,6 +42,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of rule eval error.",
 	}, []string{"datasource", "stage"})
 
+	// 3. 查询数据错误的次数
 	CounterQueryDataErrorTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -47,6 +50,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of rule eval query data error.",
 	}, []string{"datasource"})
 
+	// 4. 查询数据的次数
 	CounterQueryDataTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -54,6 +58,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of rule eval query data.",
 	}, []string{"datasource"})
 
+	// 5. 记录评估总数
 	CounterRecordEval := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -61,6 +66,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of record eval.",
 	}, []string{"datasource"})
 
+	// 6. 记录评估错误总数
 	CounterRecordEvalErrorTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -68,6 +74,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of record eval error.",
 	}, []string{"datasource"})
 
+	// 7. 发送通知消息总数
 	AlertNotifyTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -75,6 +82,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of send msg.",
 	}, []string{"channel"})
 
+	// 8. 发送通知消息错误总数
 	AlertNotifyErrorTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -82,7 +90,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of send msg.",
 	}, []string{"channel"})
 
-	// 产生的告警总量
+	// 9. 产生的告警总量
 	CounterAlertsTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -90,7 +98,7 @@ func NewSyncStats() *Stats {
 		Help:      "Total number alert events.",
 	}, []string{"cluster", "type", "busi_group"})
 
-	// 内存中的告警事件队列的长度
+	// 10. 内存中的告警事件队列的长度
 	GaugeAlertQueueSize := prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -98,6 +106,7 @@ func NewSyncStats() *Stats {
 		Help:      "The size of alert queue.",
 	})
 
+	// 11.  告警抑制数量
 	CounterMuteTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -105,6 +114,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of mute.",
 	}, []string{"group"})
 
+	// 12. 子事件总数
 	CounterSubEventTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -112,6 +122,7 @@ func NewSyncStats() *Stats {
 		Help:      "Number of sub event.",
 	}, []string{"group"})
 
+	// 13. 心跳处理失败数量
 	CounterHeartbeatErrorTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,

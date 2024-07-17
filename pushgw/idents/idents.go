@@ -79,6 +79,9 @@ func (s *Set) updateTimestamp(items map[string]struct{}) {
 			if err := s.UpdateTargets(lst, now); err != nil {
 				logger.Errorf("failed to update targets: %v", err)
 			}
+			// 通过 lst[:0] 的方式重新切片，将切片的长度置为 0，但容量保持不变。
+			// 这样做的目的可能是在重新利用切片时，清空其现有元素但保留分配的内存空间，
+			// 以便后续可以更有效地添加新元素，而无需重新分配内存
 			lst = lst[:0]
 			num = 0
 		}
@@ -100,7 +103,7 @@ func (s *Set) UpdateTargets(lst []string, now int64) error {
 		logger.Errorf("failed to update targets:%v update_ts: %v", lst, err)
 	}
 
-	if !s.ctx.IsCenter {
+	if !s.ctx.IsCenter { // 边缘侧部署的n9e需要向中心服务进行上报
 		t := TargetUpdate{
 			Lst: lst,
 			Now: now,
@@ -113,7 +116,7 @@ func (s *Set) UpdateTargets(lst []string, now int64) error {
 	if count == 0 {
 		return nil
 	}
-
+	// 更新target表中的数据（如果对应的监控对象的标识在表中）
 	ret := s.ctx.DB.Table("target").Where("ident in ?", lst).Update("update_at", now)
 	if ret.Error != nil {
 		return ret.Error

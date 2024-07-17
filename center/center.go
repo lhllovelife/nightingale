@@ -82,19 +82,20 @@ func Initialize(configDir string, cryptoKey string) (func(), error) {
 	// 以及dashboards 仪表盘、metrics 指标、alerts告警规则 写入db(if not exists in db)
 	integration.Init(ctx, config.Center.BuiltinIntegrationsDir)
 
-	// 建立redis连接
+	// 建立redis连接(支持standalone cluster sentinel三种模式)
 	var redis storage.Redis
 	redis, err = storage.NewRedis(config.Redis)
 	if err != nil {
 		return nil, err
 	}
 
-	metas := metas.New(redis)
-	idents := idents.New(ctx, redis)
+	metas := metas.New(redis)        //创建一个metas实例并对其初始化, 主要作用是管理和定时持久化主机元数据（HostMeta）到 Redis 数据库中
+	idents := idents.New(ctx, redis) //创建一个idents实例并对其初始化, 主要作用是管理和定时持久化主机元数据的更新时间, 同时将该监控对象的更新时间同步到db中
 
-	syncStats := memsto.NewSyncStats()
-	alertStats := astats.NewSyncStats()
+	syncStats := memsto.NewSyncStats()  // 用于创建并注册两个Prometheus 指标（metrics）
+	alertStats := astats.NewSyncStats() // 用于创建并注册告警相关的指标
 
+	// Sync Rules From DB
 	configCache := memsto.NewConfigCache(ctx, syncStats, config.HTTP.RSA.RSAPrivateKey, config.HTTP.RSA.RSAPassWord)
 	busiGroupCache := memsto.NewBusiGroupCache(ctx, syncStats)
 	targetCache := memsto.NewTargetCache(ctx, syncStats, redis)
