@@ -118,9 +118,16 @@ func Initialize(configDir string, cryptoKey string) (func(), error) {
 	taskTplCache := memsto.NewTaskTplCache(ctx)
 
 	sso := sso.Init(config.Center, ctx, configCache)
+	// 根据db或n9e-center中的数据源配置，自动调整Prometheus客户端的配置
 	promClients := prom.NewPromClient(ctx)
 	tdengineClients := tdengine.NewTdengineClient(ctx, config.Alert.Heartbeat)
 
+	/** TODO
+	告警引擎：一个用于处理警报事件的处理器（Processor）
+	主要功能包括从数据库恢复警报事件、处理新的警报事件、处理事件恢复、事件抑制等。
+	具体功能包括构建事件、处理事件分组、处理抑制、处理事件恢复、将事件推送到队列等。
+	例如alertRuleCache、TargetCache等，还包含处理事件的钩子函数和标签处理逻辑
+	*/
 	externalProcessors := process.NewExternalProcessors()
 	alert.Start(config.Alert, config.Pushgw, syncStats, alertStats, externalProcessors, targetCache, busiGroupCache, alertMuteCache, alertRuleCache, notifyConfigCache, taskTplCache, dsCache, ctx, promClients, tdengineClients, userCache, userGroupCache)
 

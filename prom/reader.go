@@ -26,10 +26,11 @@ func NewPromClient(ctx *ctx.Context) *PromClientMap {
 	return pc
 }
 
+// 初始化
 func (pc *PromClientMap) InitReader() error {
 	go func() {
-		for {
-			pc.loadFromDatabase()
+		for { // 每1s加载一次
+			pc.loadFromDatabase() //  从数据库或 API 加载数据源配置，并更新 Prometheus 客户端
 			time.Sleep(time.Second)
 		}
 	}()
@@ -144,6 +145,7 @@ func (pc *PromClientMap) loadFromDatabase() {
 	}
 }
 
+//
 func (pc *PromClientMap) newReaderClientFromPromOption(po PromOption) (api.Client, error) {
 	tlsConfig, _ := po.TLSConfig()
 
@@ -203,7 +205,7 @@ func (pc *PromClientMap) setClientFromPromOption(datasourceId int64, po PromOpti
 		return fmt.Errorf("failed to newClientFromPromOption: %v", err)
 	}
 
-	w := prom.NewWriter(writerCli, prom.ClientOptions{
+	writer := prom.NewWriter(writerCli, prom.ClientOptions{
 		Url:           po.WriteAddr,
 		BasicAuthUser: po.BasicAuthUser,
 		BasicAuthPass: po.BasicAuthPass,
@@ -211,7 +213,7 @@ func (pc *PromClientMap) setClientFromPromOption(datasourceId int64, po PromOpti
 	})
 
 	logger.Debugf("setClientFromPromOption: %d, %+v", datasourceId, po)
-	pc.Set(datasourceId, reader, w)
+	pc.Set(datasourceId, reader, writer)
 
 	return nil
 }

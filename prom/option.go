@@ -6,6 +6,7 @@ import (
 	"github.com/ccfos/nightingale/v6/pkg/tlsx"
 )
 
+//  Prometheus 客户端的各种参数配置
 type PromOption struct {
 	ClusterName   string
 	Url           string

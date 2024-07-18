@@ -10,9 +10,9 @@ import (
 
 type PromClientMap struct {
 	sync.RWMutex
-	ctx           *ctx.Context
-	ReaderClients map[int64]prom.API
-	WriterClients map[int64]prom.WriterType
+	ctx           *ctx.Context              // 上下文，用于传递配置和环境信息。
+	ReaderClients map[int64]prom.API        // 存储 Prometheus 读取客户端的映射 key: datasourceId
+	WriterClients map[int64]prom.WriterType // 存储 Prometheus 写入客户端的映射 key:
 }
 
 func (pc *PromClientMap) Set(datasourceId int64, r prom.API, w prom.WriterType) {
