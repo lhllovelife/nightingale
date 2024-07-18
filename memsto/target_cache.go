@@ -160,7 +160,7 @@ func (tc *TargetCacheType) syncTargets() error {
 	}
 
 	m := make(map[string]*models.Target)
-	if tc.ctx.IsCenter {
+	if tc.ctx.IsCenter { // 填充监控对象的主机元数据信息
 		metaMap := tc.GetHostMetas(lst)
 		for i := 0; i < len(lst); i++ {
 			if meta, ok := metaMap[lst[i].Ident]; ok {

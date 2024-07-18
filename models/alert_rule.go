@@ -808,7 +808,7 @@ func AlertRuleStatistics(ctx *ctx.Context) (*Statistics, error) {
 		s, err := poster.GetByUrls[*Statistics](ctx, "/v1/n9e/statistic?name=alert_rule")
 		return s, err
 	}
-
+	// 查询启用状态的告警规则
 	session := DB(ctx).Model(&AlertRule{}).Select("count(*) as total", "max(update_at) as last_updated").Where("disabled = ?", 0)
 
 	var stats []*Statistics

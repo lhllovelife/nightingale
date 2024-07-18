@@ -49,6 +49,7 @@ func (c *ConfigCache) initSyncConfigs() {
 	go c.loopSyncConfigs()
 }
 
+// 每9s同步一次用户变量
 func (c *ConfigCache) loopSyncConfigs() {
 	duration := time.Duration(9000) * time.Millisecond
 	for {
@@ -61,7 +62,7 @@ func (c *ConfigCache) loopSyncConfigs() {
 
 func (c *ConfigCache) syncConfigs() error {
 	start := time.Now()
-
+	// //用户变量统计数据（用户变量总数、最后一次更新时间）
 	stat, err := models.ConfigsUserVariableStatistics(c.ctx)
 	if err != nil {
 		dumper.PutSyncRecord("user_variables", start.Unix(), -1, -1, "failed to query statistics: "+err.Error())
@@ -74,18 +75,18 @@ func (c *ConfigCache) syncConfigs() error {
 		dumper.PutSyncRecord("user_variables", start.Unix(), -1, -1, "not changed")
 		return nil
 	}
-
+	// 读取解密后的用户变量
 	decryptMap, decryptErr := models.ConfigUserVariableGetDecryptMap(c.ctx, c.privateKey, c.passWord)
 	if decryptErr != nil {
 		dumper.PutSyncRecord("user_variables", start.Unix(), -1, -1, "failed to query records: "+decryptErr.Error())
 		return errors.WithMessage(err, "failed to call ConfigUserVariableGetDecryptMap")
 	}
-
+	// 将本地变量、条数、更新时间写入本地内存
 	c.Set(decryptMap, stat.Total, stat.LastUpdated)
-
+	// 记录指标
 	ms := time.Since(start).Milliseconds()
-	c.stats.GaugeCronDuration.WithLabelValues("sync_user_variables").Set(float64(ms))
-	c.stats.GaugeSyncNumber.WithLabelValues("sync_user_variables").Set(float64(len(decryptMap)))
+	c.stats.GaugeCronDuration.WithLabelValues("sync_user_variables").Set(float64(ms))            // 记录指标：同步用户变量耗费时间
+	c.stats.GaugeSyncNumber.WithLabelValues("sync_user_variables").Set(float64(len(decryptMap))) // 记录指标：同步用户变量的数量
 
 	logger.Infof("timer: sync user_variables done, cost: %dms, number: %d", ms, len(decryptMap))
 	dumper.PutSyncRecord("user_variables", start.Unix(), ms, len(decryptMap), "success")
@@ -93,6 +94,7 @@ func (c *ConfigCache) syncConfigs() error {
 	return nil
 }
 
+// 判定用户变量是否有变更
 func (c *ConfigCache) statChanged(total int64, updated int64) bool {
 	if c.statTotal == total && c.statLastUpdated == updated {
 		return false

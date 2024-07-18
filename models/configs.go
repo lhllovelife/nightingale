@@ -311,8 +311,9 @@ func userVariableCheck(context *ctx.Context, ckey string, id int64) error {
 	return fmt.Errorf("duplicate ckey value found: %s", ckey)
 }
 
+//用户变量统计数据（用户变量总数、最后一次更新时间）
 func ConfigsUserVariableStatistics(context *ctx.Context) (*Statistics, error) {
-	if !context.IsCenter {
+	if !context.IsCenter { // 边缘服务需要向中心服务获取数据
 		return poster.GetByUrls[*Statistics](context, "/v1/n9e/statistic?name=user_variable")
 	}
 

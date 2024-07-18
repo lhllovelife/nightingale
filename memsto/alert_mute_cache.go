@@ -133,7 +133,7 @@ func (amc *AlertMuteCacheType) syncAlertMutes() error {
 			logger.Warningf("failed to parse alert_mute, id: %d", lst[i].Id)
 			continue
 		}
-
+		// slice是零值可用的，零值切片可以安全地用于内置的 append 和 len 等函数
 		oks[lst[i].GroupId] = append(oks[lst[i].GroupId], lst[i])
 	}
 

@@ -238,7 +238,7 @@ func (uc *UserCacheType) updateUsersLastActiveTime() error {
 		if dbUser.LastActiveTime >= cacheUser.LastActiveTime {
 			continue
 		}
-
+		// DB中用户数据的最后活跃时间 小于 缓存中用户最后活跃时间, 更新DB中用户的最后活跃时间
 		err = models.UpdateUserLastActiveTime(uc.ctx, cacheUser.Id, cacheUser.LastActiveTime)
 		if err != nil {
 			logger.Warningf("failed to update last active time for user %d: %v", cacheUser.Id, err)

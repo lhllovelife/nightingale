@@ -95,16 +95,26 @@ func Initialize(configDir string, cryptoKey string) (func(), error) {
 	syncStats := memsto.NewSyncStats()  // 用于创建并注册两个Prometheus 指标（metrics）
 	alertStats := astats.NewSyncStats() // 用于创建并注册告警相关的指标
 
-	// Sync Rules From DB
+	// Sync Rules From DB To LocalCache
+	// 1. user_variables 用户变量
 	configCache := memsto.NewConfigCache(ctx, syncStats, config.HTTP.RSA.RSAPrivateKey, config.HTTP.RSA.RSAPassWord)
+	// 2. busi_groups 业务组
 	busiGroupCache := memsto.NewBusiGroupCache(ctx, syncStats)
+	// 3. targets 监控目标对象
 	targetCache := memsto.NewTargetCache(ctx, syncStats, redis)
+	// 4. datasources 数据源
 	dsCache := memsto.NewDatasourceCache(ctx, syncStats)
+	// 5. alert_mutes 屏蔽规则
 	alertMuteCache := memsto.NewAlertMuteCache(ctx, syncStats)
+	//  6. alert_rules 告警规则
 	alertRuleCache := memsto.NewAlertRuleCache(ctx, syncStats)
+	// 7. 周期性读取 webhooks、smtp、notify_script的配置
 	notifyConfigCache := memsto.NewNotifyConfigCache(ctx, configCache)
+	// 8. users 用户数据
 	userCache := memsto.NewUserCache(ctx, syncStats)
+	// 9. user_groups
 	userGroupCache := memsto.NewUserGroupCache(ctx, syncStats)
+	// 10. 告警自愈任务及脚本
 	taskTplCache := memsto.NewTaskTplCache(ctx)
 
 	sso := sso.Init(config.Center, ctx, configCache)
